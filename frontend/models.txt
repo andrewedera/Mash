@@ -1,0 +1,34 @@
+# models
+
+class Domain()
+name = char(max_length 100)
+is_used = int(default 0)
+is_active = int(default 0)
+
+class Server()
+name = char(max_length 100)
+server_type = char(max_length 30)
+server_ip = char(max_length 50)
+server_username = char(max_length 100)
+server_password = char(max_length 100)
+
+class Campaign()
+name = char(max_length 100)
+is_active = int(default = 0)
+domain_list = many2many(Domain())
+server = Server()
+
+
+
+class CUser()
+user = User()
+subtype = int ( default 0)
+campaign_list = many2many(Campaign())
+do_key = char(max_length 100, default=null)
+vu_key = char(max_length 100, default=null)
+rc_key = char(max_length 100, default=null)
+nc_key = char(max_length 100, default=null)
+fn_key = char(max_length 100, default=null)
+is_auto_rotate = int(default = 0)
+auto_rotate_minutes = int (default=0)
+rotator_running = int(default = 0)
