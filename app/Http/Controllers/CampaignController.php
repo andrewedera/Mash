@@ -24,18 +24,8 @@ class CampaignController extends Controller
 
     public function index()
     {
-        $dd = Campaign::all();
-        return CampaignResource::collection($dd);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $campaign = Campaign::all();
+        return CampaignResource::collection($campaign);
     }
 
     /**
@@ -49,29 +39,7 @@ class CampaignController extends Controller
         $Campaign = new Campaign;
         $Campaign->name = $request->name;
         $Campaign->save();
-        
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Campaign  $campaign
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Campaign $campaign)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Campaign  $campaign
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Campaign $campaign)
-    {
-        //
+        return new CampaignResource($Campaign);
     }
 
     /**
@@ -83,7 +51,10 @@ class CampaignController extends Controller
      */
     public function update(Request $request, Campaign $campaign)
     {
-        //
+        $Campaigns = Campaign::findOrFail($campaign['id']);
+        $Campaigns->name = $request['name'];
+        $Campaigns->save();
+        return new CampaignResource($Campaigns);
     }
 
     /**
@@ -94,6 +65,6 @@ class CampaignController extends Controller
      */
     public function destroy(Campaign $campaign)
     {
-        //
+        $campaign->delete();
     }
 }

@@ -16,4 +16,7 @@ Route::get('/', 'HomeController@index');
 Auth::routes();
 
 Route::get('campaigns', 'CampaignController@home');
-Route::resource('campaign', 'CampaignController');
+
+// Route::resource('campaign', 'CampaignController')->except([
+//     'create', 'show', 'edit'
+// ]);
