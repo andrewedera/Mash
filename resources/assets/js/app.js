@@ -35,4 +35,4 @@ const app = new Vue({
     }
 });
 
-Vue.prototype.$eventHub = new Vue();
+export const EventBus = new Vue();

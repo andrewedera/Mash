@@ -29,7 +29,7 @@
 						  	<tbody>
 						    	<tr v-if="campaigns.length" v-for="(campaign, index) in campaigns" v-bind:key="index">
 							      	<td scope="row" class="m-widget6__text"><a @click.prevent="toggleDomain(campaign)" href="#">{{campaign.name}}</a></td>
-							      	<td>100</td>
+							      	<td>{{campaign.domains_count}}</td>
 							      	<td><span v-bind:class="[campaign.is_active ? 'm-badge--success' : 'm-badge--warning']" class="m-badge m-badge--wide">{{campaign.is_active | statusLabel}}</span></td>
 							      	<td>
                                         <button @click.prevent="editCampaign(campaign,index)" type="button" class="btn btn-sm btn-info m-btn--icon m-btn--icon-only" title="Edit"><i class="flaticon-edit"></i></button>
@@ -78,6 +78,9 @@
 </template>
 
 <script>
+var VueBus = require('vue-bus')
+Vue.use(VueBus)
+
 export default {
     data () {
         return {
@@ -189,8 +192,8 @@ export default {
             this.campaignModel = ''
         },
         toggleDomain(campaign) {
-            this.$root.isDomain = !this.$root.isDomain
-            this.$eventHub.$emit('myEvent', campaign.id)
+            if(!this.$root.isDomain) this.$root.isDomain = true
+            this.$bus.$emit('domain-campaign', campaign.id)
         }
     },
     mounted () {

@@ -23,6 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('dashboard');
+        $data['campaign'] = \App\Campaign::count();
+        $data['domain'] = \App\Domain::count();
+        $data['server'] = \App\Server::count();
+        return view('dashboard', compact('data'));
     }
 }

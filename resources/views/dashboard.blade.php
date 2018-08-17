@@ -17,7 +17,7 @@
                         </div>
                         <div class="m-widget4__ext">
                             <span class="m-widget4__number m--font-brand">
-                                +500
+                                {{ $data['domain'] }}
                             </span>
                         </div>
                     </div>
@@ -31,7 +31,7 @@
                             <span class="m-widget4__text">Total Campaigns</span>
                         </div>
                         <div class="m-widget4__ext">
-                            <span class="m-widget4__number m--font-danger">+500</span>
+                            <span class="m-widget4__number m--font-danger">{{ $data['campaign'] }}</span>
                         </div>
                     </div>
                     <div class="m-widget4__item">
@@ -44,7 +44,7 @@
                             <span class="m-widget4__text">Total Servers</span>
                         </div>
                         <div class="m-widget4__ext">
-                            <span class="m-widget4__number m--font-success">+500</span>
+                            <span class="m-widget4__number m--font-success">{{ $data['server'] }}</span>
                         </div>
                     </div>
                 </div>

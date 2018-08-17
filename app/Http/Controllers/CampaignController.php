@@ -15,7 +15,7 @@ class CampaignController extends Controller
 
     public function index()
     {
-        $campaign = Campaign::all();
+        $campaign = Campaign::withCount('domains')->get();
         return CampaignResource::collection($campaign);
     }
 
@@ -35,7 +35,8 @@ class CampaignController extends Controller
 
     public function edit(Campaign $campaign)
     {
-        dd($campaign);
+        $camp = Campaign::findOrFail($campaign['id'])->domains;
+        return new CampaignResource($camp);
     }
 
     /**

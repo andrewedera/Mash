@@ -1718,6 +1718,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 
+var VueBus = __webpack_require__("./node_modules/vue-bus/dist/vue-bus.esm.js");
+Vue.use(VueBus);
+
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
@@ -1823,8 +1826,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.campaignModel = '';
         },
         toggleDomain: function toggleDomain(campaign) {
-            this.$root.isDomain = !this.$root.isDomain;
-            this.$eventHub.$emit('myEvent', campaign.id);
+            if (!this.$root.isDomain) this.$root.isDomain = true;
+            this.$bus.$emit('domain-campaign', campaign.id);
         }
     },
     mounted: function mounted() {
@@ -1851,14 +1854,84 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
+var VueBus = __webpack_require__("./node_modules/vue-bus/dist/vue-bus.esm.js");
+Vue.use(VueBus);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
-        this.$eventHub.$on('myEvent', data);
+    data: function data() {
+        return {
+            domains: []
+        };
+    },
+
+    filters: {
+        statusLabel: function statusLabel(used, active) {
+            if (!used && !active) return 'standby';else if (!used && active) return 'running';else if (used && !active) return 'already used';
+        }
+    },
+    methods: {
+        getDomain: function getDomain(id) {
+            var _this = this;
+
+            axios.get('api/campaign/' + id + '/edit').then(function (response) {
+                _this.domains = response.data.data;
+            }).catch(function (err) {
+                swal("Error!", err.data, "error");
+            });
+        },
+        toggleModal: function toggleModal() {
+            this.domains = [];
+            this.$root.isDomain = false;
+        }
+    },
+    created: function created() {
+        var self = this;
+        this.$bus.$on('domain-campaign', function (id) {
+            self.getDomain(id);
+        });
     },
     beforeDestroy: function beforeDestroy() {
-        this.$eventHub.$off('myEvent');
+        this.$bus.$off('domain-campaign');
     }
 });
 
@@ -40558,6 +40631,60 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/vue-bus/dist/vue-bus.esm.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/**
+ * vue-bus v1.1.0
+ * https://github.com/yangmingshan/vue-bus
+ * @license MIT
+ */
+function VueBus(Vue) {
+  var bus = new Vue();
+
+  Object.defineProperties(bus, {
+    on: {
+      get: function get() {
+        return this.$on
+      }
+    },
+    once: {
+      get: function get() {
+        return this.$once
+      }
+    },
+    off: {
+      get: function get() {
+        return this.$off
+      }
+    },
+    emit: {
+      get: function get() {
+        return this.$emit
+      }
+    }
+  });
+
+  Vue.bus = bus;
+
+  Object.defineProperty(Vue.prototype, '$bus', {
+    get: function get() {
+      return bus
+    }
+  });
+}
+
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use(VueBus);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (VueBus);
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/component-normalizer.js":
 /***/ (function(module, exports) {
 
@@ -40730,7 +40857,7 @@ var render = function() {
                             ]
                           ),
                           _vm._v(" "),
-                          _c("td", [_vm._v("100")]),
+                          _c("td", [_vm._v(_vm._s(campaign.domains_count))]),
                           _vm._v(" "),
                           _c("td", [
                             _c(
@@ -41040,9 +41167,136 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return this.$root.isDomain ? _c("div", [_vm._v("\n    test\n")]) : _vm._e()
+  return this.$root.isDomain && this.domains
+    ? _c("div", [
+        _c("div", { staticClass: "m-portlet" }, [
+          _c("div", { staticClass: "m-portlet__head" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("div", { staticClass: "m-portlet__head-tools" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-sm btn-danger m-btn",
+                  attrs: { type: "button" },
+                  on: { click: _vm.toggleModal }
+                },
+                [_c("i", { staticClass: "fa fa-times" })]
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "m-portlet__body" }, [
+            _c("div", { staticClass: "m-section" }, [
+              _c("div", { staticClass: "m-section__content" }, [
+                _c(
+                  "table",
+                  { staticClass: "table table-striped m-table text-center" },
+                  [
+                    _vm._m(1),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(_vm.domains, function(domain, index) {
+                        return _vm.domains.length
+                          ? _c("tr", { key: index }, [
+                              _c(
+                                "td",
+                                {
+                                  staticClass: "m-widget6__text",
+                                  attrs: { scope: "row" }
+                                },
+                                [
+                                  _c("a", { attrs: { href: "#" } }, [
+                                    _vm._v(_vm._s(domain.name))
+                                  ])
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c(
+                                  "span",
+                                  {
+                                    staticClass: "m-badge m-badge--wide",
+                                    class: [
+                                      domain.is_active
+                                        ? "m-badge--success"
+                                        : "m-badge--warning"
+                                    ]
+                                  },
+                                  [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm._f("statusLabel")(
+                                          _vm._f("domain.is_active")(
+                                            domain.is_used
+                                          )
+                                        )
+                                      )
+                                    )
+                                  ]
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _vm._m(2, true)
+                            ])
+                          : _vm._e()
+                      })
+                    )
+                  ]
+                )
+              ])
+            ])
+          ])
+        ])
+      ])
+    : _vm._e()
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "m-portlet__head-caption" }, [
+      _c("div", { staticClass: "m-portlet__head-title" }, [
+        _c("h3", { staticClass: "m-portlet__head-text" }, [
+          _vm._v(
+            "\n                            Campaign\n                        "
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Domain Name")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Status")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Action")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-sm btn-info m-btn--icon m-btn--icon-only",
+          attrs: { type: "button", title: "Edit" }
+        },
+        [_c("i", { staticClass: "flaticon-edit" })]
+      )
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -52607,6 +52861,7 @@ module.exports = function(module) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventBus", function() { return EventBus; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_sweetalert2__ = __webpack_require__("./node_modules/vue-sweetalert2/src/index.js");
 
 /**
@@ -52645,7 +52900,7 @@ var app = new Vue({
   }
 });
 
-Vue.prototype.$eventHub = new Vue();
+var EventBus = new Vue();
 
 /***/ }),
 

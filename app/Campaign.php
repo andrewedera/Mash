@@ -14,4 +14,9 @@ class Campaign extends Model
         $this->is_active = !$this->is_active;
         return $this;
     }
+
+    public function domains()
+    {
+        return $this->hasMany('App\Domain');
+    }
 }
