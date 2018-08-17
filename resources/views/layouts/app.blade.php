@@ -6,6 +6,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+@if (auth()->check())
+	<meta name="api-token" content="{{ Auth::user()->api_token }}">
+@endif
 	<title>botDashboard</title>
 	<!--begin::Web font -->
 	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
@@ -78,7 +81,7 @@
 				<div class="m-subheader">
 					<div class="d-flex align-items-center">
 						<div class="mr-auto">
-							<h3 class="m-subheader__title">Welcome, User!</h3>
+							<h3 class="m-subheader__title">Welcome, {{ Auth::user()->name }}!</h3>
 						</div>
 					</div>
 				</div>

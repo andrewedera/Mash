@@ -1704,12 +1704,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
             isModalshown: false,
             isEdit: false,
+            isActive: false,
             campaigns: [],
             campaignID: '',
             campaignIndex: '',
@@ -1717,6 +1731,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         };
     },
 
+    filters: {
+        statusLabel: function statusLabel(value) {
+            if (value) return 'active';else return 'paused';
+        }
+    },
     methods: {
         submitCampaign: function submitCampaign() {
             if (this.campaignModel) {
@@ -1739,13 +1758,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         name: campaign
                     }).then(function (response) {
                         Vue.set(campaigns, index, response.data.data);
-                        swal("Success!", "Campaign has been saved successfully.", "success");
+                        swal("Success!", "Campaign has been updated successfully.", "success");
                     }).catch(function (err) {
                         swal("Error!", err.data, "error");
                     });
                 }
                 this.empty();
             }
+        },
+        updateStatus: function updateStatus(campaign, index) {
+            var _this = this;
+
+            axios.put('api/campaign/' + campaign.id, {
+                toggleStatus: true
+            }).then(function (response) {
+                Vue.set(_this.campaigns, index, response.data.data);
+            }).catch(function (err) {
+                swal("Error!", err.data, "error");
+            });
         },
         editCampaign: function editCampaign(campaign, index) {
             this.toggleModal();
@@ -1769,7 +1799,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 if (e.value) {
                     axios.delete('api/campaign/' + campaign.id).then(function (response) {
                         Vue.delete(campaigns, index);
-                        swal("Deleted!", "Campaign has been deleted.", "success");
+                        swal("Deleted!", "Campaign has been deleted successfully..", "success");
                     }).catch(function (err) {
                         swal("Error!", err.data, "error");
                     });
@@ -1779,23 +1809,56 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         toggleModal: function toggleModal() {
+            var _this2 = this;
+
             this.isModalshown = !this.isModalshown;
+            this.$nextTick(function () {
+                return _this2.$refs.campaign.focus();
+            });
         },
         empty: function empty() {
             this.isEdit = false;
             this.campaignID = '';
             this.campaignIndex = '';
             this.campaignModel = '';
+        },
+        toggleDomain: function toggleDomain(campaign) {
+            this.$root.isDomain = !this.$root.isDomain;
+            this.$eventHub.$emit('myEvent', campaign.id);
         }
     },
     mounted: function mounted() {
-        var _this = this;
+        var _this3 = this;
 
         axios.get('api/campaign').then(function (response) {
-            _this.campaigns = response.data.data;
+            _this3.campaigns = response.data.data;
         }).catch(function (err) {
             swal("Error!", err.data, "error");
         });
+    }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/assets/js/components/DomainComponent.vue":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    mounted: function mounted() {
+        this.$eventHub.$on('myEvent', data);
+    },
+    beforeDestroy: function beforeDestroy() {
+        this.$eventHub.$off('myEvent');
     }
 });
 
@@ -5823,7 +5886,7 @@ exports = module.exports = __webpack_require__("./node_modules/css-loader/lib/cs
 
 
 // module
-exports.push([module.i, "\n.m-widget6__text[data-v-2912e8e6] {\r\n    vertical-align: middle!important;\r\n    font-size: 1.25rem!important;\r\n    font-weight: 600;\n}\n#m_modal[data-v-2912e8e6] {\r\n    display: block;\n}\r\n", ""]);
+exports.push([module.i, "\n.m-widget6__text[data-v-2912e8e6] {\r\n    vertical-align: middle!important;\r\n    font-size: 1.25rem!important;\r\n    font-weight: 600;\n}\n.table th[data-v-2912e8e6],\r\n.table td[data-v-2912e8e6] {\r\n    vertical-align: middle;\n}\n#m_modal[data-v-2912e8e6] {\r\n    display: block;\n}\r\n", ""]);
 
 // exports
 
@@ -40631,60 +40694,137 @@ var render = function() {
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "m-portlet__body" }, [
-        _c("div", { staticClass: "m-widget6" }, [
-          _vm._m(1),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "m-widget6__body" },
-            _vm._l(_vm.campaigns, function(campaign, index) {
-              return _vm.campaigns.length
-                ? _c("div", { key: index, staticClass: "m-widget6__item" }, [
-                    _c("span", { staticClass: "m-widget6__text" }, [
-                      _c("a", { attrs: { href: "#" } }, [
-                        _vm._v(_vm._s(campaign.name))
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "span",
-                      {
-                        staticClass:
-                          "m-widget6__text m--align-right m--font-boldest m--font-brand"
-                      },
-                      [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-sm btn-info mx-1",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.editCampaign(campaign, index)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "flaticon-edit" })]
-                        ),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-sm btn-danger mx-1",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.deleteEvent(campaign, index)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "flaticon-delete-2" })]
-                        )
-                      ]
-                    )
-                  ])
-                : _vm._e()
-            })
-          )
+        _c("div", { staticClass: "m-section" }, [
+          _c("div", { staticClass: "m-section__content" }, [
+            _c(
+              "table",
+              { staticClass: "table table-striped m-table text-center" },
+              [
+                _vm._m(1),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.campaigns, function(campaign, index) {
+                    return _vm.campaigns.length
+                      ? _c("tr", { key: index }, [
+                          _c(
+                            "td",
+                            {
+                              staticClass: "m-widget6__text",
+                              attrs: { scope: "row" }
+                            },
+                            [
+                              _c(
+                                "a",
+                                {
+                                  attrs: { href: "#" },
+                                  on: {
+                                    click: function($event) {
+                                      $event.preventDefault()
+                                      _vm.toggleDomain(campaign)
+                                    }
+                                  }
+                                },
+                                [_vm._v(_vm._s(campaign.name))]
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c("td", [_vm._v("100")]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "span",
+                              {
+                                staticClass: "m-badge m-badge--wide",
+                                class: [
+                                  campaign.is_active
+                                    ? "m-badge--success"
+                                    : "m-badge--warning"
+                                ]
+                              },
+                              [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm._f("statusLabel")(campaign.is_active)
+                                  )
+                                )
+                              ]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "button",
+                              {
+                                staticClass:
+                                  "btn btn-sm btn-info m-btn--icon m-btn--icon-only",
+                                attrs: { type: "button", title: "Edit" },
+                                on: {
+                                  click: function($event) {
+                                    $event.preventDefault()
+                                    _vm.editCampaign(campaign, index)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "flaticon-edit" })]
+                            ),
+                            _vm._v(" "),
+                            !campaign.is_active
+                              ? _c(
+                                  "button",
+                                  {
+                                    staticClass:
+                                      "btn btn-sm btn-success m-btn--icon m-btn--icon-only",
+                                    attrs: { title: "Resume" },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        _vm.updateStatus(campaign, index)
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "la la-play" })]
+                                )
+                              : _c(
+                                  "button",
+                                  {
+                                    staticClass:
+                                      "btn btn-sm btn-warning m-btn--icon m-btn--icon-only",
+                                    attrs: { title: "Pause" },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        _vm.updateStatus(campaign, index)
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "la la-pause" })]
+                                ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass:
+                                  "btn btn-sm btn-danger m-btn--icon m-btn--icon-only",
+                                attrs: { type: "button", title: "Remove" },
+                                on: {
+                                  click: function($event) {
+                                    $event.preventDefault()
+                                    _vm.deleteEvent(campaign, index)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "flaticon-delete-2" })]
+                            )
+                          ])
+                        ])
+                      : _vm._e()
+                  })
+                )
+              ]
+            )
+          ])
         ])
       ])
     ]),
@@ -40777,8 +40917,9 @@ var render = function() {
                           expression: "campaignModel"
                         }
                       ],
+                      ref: "campaign",
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "message-text" },
+                      attrs: { type: "text" },
                       domProps: { value: _vm.campaignModel },
                       on: {
                         input: function($event) {
@@ -40857,7 +40998,9 @@ var staticRenderFns = [
     return _c("div", { staticClass: "m-portlet__head-caption" }, [
       _c("div", { staticClass: "m-portlet__head-title" }, [
         _c("h3", { staticClass: "m-portlet__head-text" }, [
-          _vm._v("\n                        Campaigns\n                    ")
+          _vm._v(
+            "\n                            Campaigns\n                        "
+          )
         ])
       ])
     ])
@@ -40866,13 +41009,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "m-widget6__head" }, [
-      _c("div", { staticClass: "m-widget6__item" }, [
-        _c("span", { staticClass: "m-widget6__caption" }, [_vm._v("Campaign")]),
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Campaign")]),
         _vm._v(" "),
-        _c("span", { staticClass: "m-widget6__caption m--align-right" }, [
-          _vm._v("Action")
-        ])
+        _c("th", [_vm._v("Domains")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Status")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Action")])
       ])
     ])
   }
@@ -40883,6 +41028,27 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
     require("vue-hot-reload-api")      .rerender("data-v-2912e8e6", module.exports)
+  }
+}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d6c85f2\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/assets/js/components/DomainComponent.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return this.$root.isDomain ? _c("div", [_vm._v("\n    test\n")]) : _vm._e()
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-7d6c85f2", module.exports)
   }
 }
 
@@ -52464,6 +52630,7 @@ window.Vue = __webpack_require__("./node_modules/vue/dist/vue.common.js");
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
 Vue.component('sidebar-component', __webpack_require__("./resources/assets/js/components/SidebarComponent.vue"));
 Vue.component('campaign-component', __webpack_require__("./resources/assets/js/components/CampaignComponent.vue"));
+Vue.component('domain-component', __webpack_require__("./resources/assets/js/components/DomainComponent.vue"));
 
 Vue.filter('uppercase', function (value) {
   return value.toUpperCase();
@@ -52472,8 +52639,13 @@ Vue.filter('uppercase', function (value) {
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_sweetalert2__["a" /* default */]);
 
 var app = new Vue({
-  el: '#app'
+  el: '#app',
+  data: {
+    isDomain: false
+  }
 });
+
+Vue.prototype.$eventHub = new Vue();
 
 /***/ }),
 
@@ -52518,6 +52690,12 @@ if (token) {
   window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 } else {
   console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
+
+var api_token = document.head.querySelector('meta[name="api-token"]');
+
+if (api_token) {
+  window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + api_token.content;
 }
 
 /**
@@ -52580,6 +52758,54 @@ if (false) {(function () {
     hotAPI.createRecord("data-v-2912e8e6", Component.options)
   } else {
     hotAPI.reload("data-v-2912e8e6", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+
+/***/ "./resources/assets/js/components/DomainComponent.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__("./node_modules/vue-loader/lib/component-normalizer.js")
+/* script */
+var __vue_script__ = __webpack_require__("./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/assets/js/components/DomainComponent.vue")
+/* template */
+var __vue_template__ = __webpack_require__("./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d6c85f2\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/assets/js/components/DomainComponent.vue")
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\DomainComponent.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-7d6c85f2", Component.options)
+  } else {
+    hotAPI.reload("data-v-7d6c85f2", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true

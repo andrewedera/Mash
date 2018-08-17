@@ -9,4 +9,9 @@ class Campaign extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function toggleStatus() {
+        $this->is_active = !$this->is_active;
+        return $this;
+    }
 }

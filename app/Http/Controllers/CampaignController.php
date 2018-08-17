@@ -10,16 +10,7 @@ class CampaignController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function home()
-    {
-        return view('campaigns');
+        $this->middleware('auth:api');
     }
 
     public function index()
@@ -42,6 +33,11 @@ class CampaignController extends Controller
         return new CampaignResource($Campaign);
     }
 
+    public function edit(Campaign $campaign)
+    {
+        dd($campaign);
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -52,7 +48,12 @@ class CampaignController extends Controller
     public function update(Request $request, Campaign $campaign)
     {
         $Campaigns = Campaign::findOrFail($campaign['id']);
-        $Campaigns->name = $request['name'];
+        if ($request->has('name')) {
+            $Campaigns->name = $request['name'];
+        }
+        if ($request->has('toggleStatus')) {
+            $Campaigns->toggleStatus();
+        }
         $Campaigns->save();
         return new CampaignResource($Campaigns);
     }

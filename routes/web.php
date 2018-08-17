@@ -15,7 +15,11 @@ Route::get('/', 'HomeController@index');
 
 Auth::routes();
 
-Route::get('campaigns', 'CampaignController@home');
+Route::middleware(['auth'])->group(function () {
+    Route::get('campaigns', function(){
+        return view('campaigns');
+    });
+});
 
 // Route::resource('campaign', 'CampaignController')->except([
 //     'create', 'show', 'edit'

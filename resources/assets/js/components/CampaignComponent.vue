@@ -15,20 +15,33 @@
                 </div>
             </div>
             <div class="m-portlet__body">
-                <div class="m-widget6">
-                    <div class="m-widget6__head">
-                        <div class="m-widget6__item">
-                            <span class="m-widget6__caption">Campaign</span>
-                            <span class="m-widget6__caption m--align-right">Action</span>
-                        </div>
-                    </div>
-                    <div class="m-widget6__body">
-                        <div v-if="campaigns.length" class="m-widget6__item" v-for="(campaign, index) in campaigns" v-bind:key="index">
-                            <span class="m-widget6__text"><a href="#">{{campaign.name}}</a></span>
-                            <span class="m-widget6__text m--align-right m--font-boldest m--font-brand"><button @click="editCampaign(campaign,index)" type="button" class="btn btn-sm btn-info mx-1"><i class="flaticon-edit"></i></button><button @click="deleteEvent(campaign,index)" type="button" class="btn btn-sm btn-danger mx-1"><i class="flaticon-delete-2"></i></button></span>
-                        </div>
-                    </div>
-                </div>
+                <div class="m-section">
+					<div class="m-section__content">
+						<table class="table table-striped m-table text-center">
+						  	<thead>
+						    	<tr>
+						      		<th>Campaign</th>
+						      		<th>Domains</th>
+						      		<th>Status</th>
+						      		<th>Action</th>
+						    	</tr>
+						  	</thead>
+						  	<tbody>
+						    	<tr v-if="campaigns.length" v-for="(campaign, index) in campaigns" v-bind:key="index">
+							      	<td scope="row" class="m-widget6__text"><a @click.prevent="toggleDomain(campaign)" href="#">{{campaign.name}}</a></td>
+							      	<td>100</td>
+							      	<td><span v-bind:class="[campaign.is_active ? 'm-badge--success' : 'm-badge--warning']" class="m-badge m-badge--wide">{{campaign.is_active | statusLabel}}</span></td>
+							      	<td>
+                                        <button @click.prevent="editCampaign(campaign,index)" type="button" class="btn btn-sm btn-info m-btn--icon m-btn--icon-only" title="Edit"><i class="flaticon-edit"></i></button>
+                                        <button @click.prevent="updateStatus(campaign,index)" v-if="!campaign.is_active" class="btn btn-sm btn-success m-btn--icon m-btn--icon-only" title="Resume"><i class="la la-play"></i></button>
+                                        <button @click.prevent="updateStatus(campaign,index)" v-else class="btn btn-sm btn-warning m-btn--icon m-btn--icon-only" title="Pause"><i class="la la-pause"></i></button>
+                                        <button @click.prevent="deleteEvent(campaign,index)" type="button" class="btn btn-sm btn-danger m-btn--icon m-btn--icon-only" title="Remove"><i class="flaticon-delete-2"></i></button>
+                                    </td>
+						    	</tr>
+						  	</tbody>
+						</table>
+					</div>
+				</div>
             </div>
         </div>
         <!--end::Portlet-->
@@ -47,7 +60,7 @@
                     <form>
                         <div class="form-group">
                             <label for="message-text" class="form-control-label">Enter Campaign name</label>
-                            <input v-model="campaignModel" type="text" class="form-control" id="message-text"/>
+                            <input v-model="campaignModel" type="text" class="form-control" ref="campaign"/>
                         </div>
                     </form>
                 </div>
@@ -70,10 +83,19 @@ export default {
         return {
             isModalshown: false,
             isEdit: false,
+            isActive: false,
             campaigns: [],
             campaignID: '',
             campaignIndex: '',
             campaignModel: ''
+        }
+    },
+    filters: {
+        statusLabel: function(value) {
+            if(value)
+                return 'active'
+            else
+                return 'paused'
         }
     },
     methods: {
@@ -102,7 +124,7 @@ export default {
                     })
                         .then(response => {
                             Vue.set(campaigns, index, response.data.data)
-                            swal("Success!", "Campaign has been saved successfully.", "success")
+                            swal("Success!", "Campaign has been updated successfully.", "success")
                         })
                         .catch(err => {
                             swal("Error!", err.data, "error")
@@ -110,6 +132,17 @@ export default {
                 }
                 this.empty()
             }
+        },
+        updateStatus(campaign, index) {
+            axios.put(`api/campaign/${campaign.id}`, {
+                toggleStatus: true,
+            })
+                .then(response => {
+                    Vue.set(this.campaigns, index, response.data.data)
+                })
+                .catch(err => {
+                    swal("Error!", err.data, "error")
+                })
         },
         editCampaign(campaign, index) {
             this.toggleModal()
@@ -134,7 +167,7 @@ export default {
                     axios.delete(`api/campaign/${campaign.id}`)
                         .then(response => {
                             Vue.delete( campaigns, index )
-                            swal("Deleted!", "Campaign has been deleted.", "success")
+                            swal("Deleted!", "Campaign has been deleted successfully..", "success")
                         })
                         .catch(err => {
                             swal("Error!", err.data, "error")
@@ -147,12 +180,17 @@ export default {
         },
         toggleModal() {
             this.isModalshown = !this.isModalshown
+            this.$nextTick(() => this.$refs.campaign.focus())
         },
         empty() {
             this.isEdit = false
             this.campaignID = ''
             this.campaignIndex = ''
             this.campaignModel = ''
+        },
+        toggleDomain(campaign) {
+            this.$root.isDomain = !this.$root.isDomain
+            this.$eventHub.$emit('myEvent', campaign.id)
         }
     },
     mounted () {
@@ -172,6 +210,10 @@ export default {
     vertical-align: middle!important;
     font-size: 1.25rem!important;
     font-weight: 600;
+}
+.table th,
+.table td {
+    vertical-align: middle;
 }
 #m_modal {
     display: block;
