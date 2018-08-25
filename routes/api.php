@@ -13,11 +13,18 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::resource('campaign', 'CampaignController')->except([
     'create', 'show'
+]);
+
+Route::resource('domain', 'DomainController')->only([
+    'store', 'update', 'destroy'
+]);
+
+Route::resource('server', 'ServerController')->only([
+    'store'
 ]);

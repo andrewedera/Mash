@@ -33,7 +33,7 @@
 							      	<td><span v-bind:class="[campaign.is_active ? 'm-badge--success' : 'm-badge--warning']" class="m-badge m-badge--wide">{{campaign.is_active | statusLabel}}</span></td>
 							      	<td>
                                         <button @click.prevent="editCampaign(campaign,index)" type="button" class="btn btn-sm btn-info m-btn--icon m-btn--icon-only" title="Edit"><i class="flaticon-edit"></i></button>
-                                        <button @click.prevent="updateStatus(campaign,index)" v-if="!campaign.is_active" class="btn btn-sm btn-success m-btn--icon m-btn--icon-only" title="Resume"><i class="la la-play"></i></button>
+                                        <button @click.prevent="updateStatus(campaign,index)" v-if="!campaign.is_active" class="btn btn-sm btn-success m-btn--icon m-btn--icon-only" title="Play"><i class="la la-play"></i></button>
                                         <button @click.prevent="updateStatus(campaign,index)" v-else class="btn btn-sm btn-warning m-btn--icon m-btn--icon-only" title="Pause"><i class="la la-pause"></i></button>
                                         <button @click.prevent="deleteEvent(campaign,index)" type="button" class="btn btn-sm btn-danger m-btn--icon m-btn--icon-only" title="Remove"><i class="flaticon-delete-2"></i></button>
                                     </td>
@@ -113,11 +113,11 @@ export default {
                         name: campaign,
                     })
                         .then(response => {
-                            campaigns.push(response.data.data)
+                            this.campaigns = response.data.data
                             swal("Success!", "Campaign has been saved successfully.", "success")
                         })
                         .catch(err => {
-                            swal("Error!", err.data, "error")
+                            swal("Error!", err.response.data.data, "error")
                         })
                 }
                 else {
@@ -130,7 +130,7 @@ export default {
                             swal("Success!", "Campaign has been updated successfully.", "success")
                         })
                         .catch(err => {
-                            swal("Error!", err.data, "error")
+                            swal("Error!", err.response.data.data, "error")
                         })
                 }
                 this.empty()
@@ -144,7 +144,7 @@ export default {
                     Vue.set(this.campaigns, index, response.data.data)
                 })
                 .catch(err => {
-                    swal("Error!", err.data, "error")
+                    swal("Error!", err.response.data.data, "error")
                 })
         },
         editCampaign(campaign, index) {
@@ -173,7 +173,7 @@ export default {
                             swal("Deleted!", "Campaign has been deleted successfully..", "success")
                         })
                         .catch(err => {
-                            swal("Error!", err.data, "error")
+                            swal("Error!", err.response.data.data, "error")
                         })
                 }
                 else {
@@ -202,7 +202,7 @@ export default {
                 this.campaigns = response.data.data
             })
             .catch(err => {
-                swal("Error!", err.data, "error")
+                swal("Error!", err.response.data.data, "error")
             })
     }
 }

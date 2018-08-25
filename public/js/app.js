@@ -1741,6 +1741,8 @@ Vue.use(VueBus);
     },
     methods: {
         submitCampaign: function submitCampaign() {
+            var _this = this;
+
             if (this.campaignModel) {
                 var campaigns = this.campaigns;
                 var campaign = this.$options.filters.uppercase(this.campaignModel);
@@ -1750,10 +1752,10 @@ Vue.use(VueBus);
                     axios.post('api/campaign', {
                         name: campaign
                     }).then(function (response) {
-                        campaigns.push(response.data.data);
+                        _this.campaigns = response.data.data;
                         swal("Success!", "Campaign has been saved successfully.", "success");
                     }).catch(function (err) {
-                        swal("Error!", err.data, "error");
+                        swal("Error!", err.response.data.data, "error");
                     });
                 } else {
                     var index = this.campaignIndex;
@@ -1763,21 +1765,21 @@ Vue.use(VueBus);
                         Vue.set(campaigns, index, response.data.data);
                         swal("Success!", "Campaign has been updated successfully.", "success");
                     }).catch(function (err) {
-                        swal("Error!", err.data, "error");
+                        swal("Error!", err.response.data.data, "error");
                     });
                 }
                 this.empty();
             }
         },
         updateStatus: function updateStatus(campaign, index) {
-            var _this = this;
+            var _this2 = this;
 
             axios.put('api/campaign/' + campaign.id, {
                 toggleStatus: true
             }).then(function (response) {
-                Vue.set(_this.campaigns, index, response.data.data);
+                Vue.set(_this2.campaigns, index, response.data.data);
             }).catch(function (err) {
-                swal("Error!", err.data, "error");
+                swal("Error!", err.response.data.data, "error");
             });
         },
         editCampaign: function editCampaign(campaign, index) {
@@ -1804,7 +1806,7 @@ Vue.use(VueBus);
                         Vue.delete(campaigns, index);
                         swal("Deleted!", "Campaign has been deleted successfully..", "success");
                     }).catch(function (err) {
-                        swal("Error!", err.data, "error");
+                        swal("Error!", err.response.data.data, "error");
                     });
                 } else {
                     "cancel" === e.dismiss;
@@ -1812,11 +1814,11 @@ Vue.use(VueBus);
             });
         },
         toggleModal: function toggleModal() {
-            var _this2 = this;
+            var _this3 = this;
 
             this.isModalshown = !this.isModalshown;
             this.$nextTick(function () {
-                return _this2.$refs.campaign.focus();
+                return _this3.$refs.campaign.focus();
             });
         },
         empty: function empty() {
@@ -1831,12 +1833,12 @@ Vue.use(VueBus);
         }
     },
     mounted: function mounted() {
-        var _this3 = this;
+        var _this4 = this;
 
         axios.get('api/campaign').then(function (response) {
-            _this3.campaigns = response.data.data;
+            _this4.campaigns = response.data.data;
         }).catch(function (err) {
-            swal("Error!", err.data, "error");
+            swal("Error!", err.response.data.data, "error");
         });
     }
 });
@@ -1893,6 +1895,87 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var VueBus = __webpack_require__("./node_modules/vue-bus/dist/vue-bus.esm.js");
 Vue.use(VueBus);
@@ -1900,13 +1983,25 @@ Vue.use(VueBus);
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
-            domains: []
+            campaign: '',
+            domainModel: '',
+            domainID: '',
+            domainIndex: '',
+            campaignID: '',
+            isModalshown: false,
+            isEdit: false,
+            domains: [],
+            serverName: '',
+            serverType: '',
+            serverHost: '',
+            serverUsername: '',
+            serverPassword: ''
         };
     },
 
     filters: {
         statusLabel: function statusLabel(used, active) {
-            if (!used && !active) return 'standby';else if (!used && active) return 'running';else if (used && !active) return 'already used';
+            if (!used && !active) return 'standby';else if (!used && active) return 'running';else return 'already used';
         }
     },
     methods: {
@@ -1915,13 +2010,139 @@ Vue.use(VueBus);
 
             axios.get('api/campaign/' + id + '/edit').then(function (response) {
                 _this.domains = response.data.data;
+                _this.campaignID = response.data.campaign_id;
+                _this.campaign = response.data.campaign;
+                _this.serverName = '';
+                _this.serverType = '';
+                _this.serverHost = '';
+                _this.serverUsername = '';
+                _this.serverPassword = '';
+                if (response.data.server) {
+                    _this.serverName = response.data.server.name;
+                    _this.serverType = response.data.server.server_type;
+                    _this.serverHost = response.data.server.server_ip;
+                    _this.serverUsername = response.data.server.server_username;
+                    _this.serverPassword = response.data.server.server_password;
+                }
             }).catch(function (err) {
-                swal("Error!", err.data, "error");
+                swal("Error!", err.response.data.data, "error");
+            });
+        },
+        submitDomain: function submitDomain() {
+            if (this.domainModel) {
+                var domains = this.domains;
+                var campaign_id = this.campaignID;
+                var domain = this.domainModel;
+                var domainID = this.domainID;
+                var edit = this.isEdit;
+                if (!edit) {
+                    axios.post('api/domain', {
+                        name: domain,
+                        campaign_id: campaign_id
+                    }).then(function (response) {
+                        domains.push(response.data.data);
+                        swal("Success!", "Domain has been saved successfully.", "success");
+                    }).catch(function (err) {
+                        swal("Error!", err.response.data.errors, "error");
+                    });
+                } else {
+                    var index = this.domainIndex;
+                    axios.put('api/domain/' + domainID, {
+                        name: domain
+                    }).then(function (response) {
+                        Vue.set(domains, index, response.data.data);
+                        swal("Success!", "Domain has been updated successfully.", "success");
+                    }).catch(function (err) {
+                        swal("Error!", err.response.data.data, "error");
+                    });
+                }
+                this.empty();
+            }
+        },
+        deleteDomain: function deleteDomain(domain, index) {
+            var domains = this.domains;
+            swal({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                type: "warning",
+                showCancelButton: !0,
+                confirmButtonText: "Confirm",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#d33",
+                reverseButtons: !0
+            }).then(function (e) {
+                if (e.value) {
+                    axios.delete('api/domain/' + domain.id).then(function (response) {
+                        Vue.delete(domains, index);
+                        swal("Deleted!", "Domain has been deleted successfully..", "success");
+                    }).catch(function (err) {
+                        swal("Error!", err.response.data.data, "error");
+                    });
+                } else {
+                    "cancel" === e.dismiss;
+                }
+            });
+        },
+        editDomain: function editDomain(domain, index) {
+            this.toggleDomainModal();
+            this.isEdit = true;
+            this.domainID = domain.id;
+            this.domainModel = domain.name;
+            this.domainIndex = index;
+        },
+        updateStatus: function updateStatus(campaign, index) {
+            var _this2 = this;
+
+            axios.put('api/domain/' + campaign.id, {
+                toggleStatus: true
+            }).then(function (response) {
+                Vue.set(_this2.domains, index, response.data.data);
+            }).catch(function (err) {
+                console.log(err.response);
+                swal("Error!", err.response.data.data, "error");
+            });
+        },
+        submitServer: function submitServer() {
+            if (this.serverName && this.serverHost && this.serverType && this.serverPassword) {
+                var campaign_id = this.campaignID;
+                var serverName = this.serverName;
+                var serverType = this.serverType;
+                var serverHost = this.serverHost;
+                var serverUsername = this.serverUsername;
+                var serverPassword = this.serverPassword;
+                axios.post('api/server', {
+                    campaign_id: campaign_id,
+                    name: serverName,
+                    server_ip: serverHost,
+                    server_password: serverPassword,
+                    server_type: serverType,
+                    server_username: serverUsername
+                }).then(function (response) {
+                    swal("Success!", "Server has been saved successfully.", "success");
+                }).catch(function (err) {
+                    swal("Error!", err.response.data.errors, "error");
+                });
+            }
+        },
+        toggleDomainModal: function toggleDomainModal() {
+            var _this3 = this;
+
+            this.isModalshown = !this.isModalshown;
+            this.$nextTick(function () {
+                return _this3.$refs.domain.focus();
             });
         },
         toggleModal: function toggleModal() {
             this.domains = [];
             this.$root.isDomain = false;
+        },
+        empty: function empty() {
+            this.isEdit = false;
+            this.domainModel = '';
+            this.domainID = '';
+            this.domainIndex = '';
+            this.campaign = '';
+            this.campaignID = '';
         }
     },
     created: function created() {
@@ -1968,19 +2189,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    methods: {
-        logout: function logout() {
-            var _this = this;
+	data: function data() {
+		return {
+			user_token: ''
+		};
+	},
 
-            axios.post("/logout").then(function (response) {
-                _this.data = response.data;
-                console.log(_this.data);
-            }).catch(function (err) {
-                console.log(err.response.data.errors);
-                //this.errors.push(err.response.data.errors);
-            });
-        }
-    }
+	methods: {
+		logout: function logout() {
+			axios.post('/logout').then(function (response) {
+				window.location.href = '/login';
+			}).catch(function (err) {
+				console.log(err.response.data.error);
+				//this.errors.push(err.response.data.errors);
+			});
+		}
+	}
 });
 
 /***/ }),
@@ -5960,6 +6184,21 @@ exports = module.exports = __webpack_require__("./node_modules/css-loader/lib/cs
 
 // module
 exports.push([module.i, "\n.m-widget6__text[data-v-2912e8e6] {\r\n    vertical-align: middle!important;\r\n    font-size: 1.25rem!important;\r\n    font-weight: 600;\n}\n.table th[data-v-2912e8e6],\r\n.table td[data-v-2912e8e6] {\r\n    vertical-align: middle;\n}\n#m_modal[data-v-2912e8e6] {\r\n    display: block;\n}\r\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7d6c85f2\",\"scoped\":true,\"hasInlineConfig\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./resources/assets/js/components/DomainComponent.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.m-widget6__text[data-v-7d6c85f2] {\r\n    vertical-align: middle!important;\r\n    font-weight: 400;\n}\n.table th[data-v-7d6c85f2],\r\n.table td[data-v-7d6c85f2] {\r\n    vertical-align: middle;\n}\n#m_modal[data-v-7d6c85f2] {\r\n    display: block;\n}\n.campaign[data-v-7d6c85f2] {\r\n    margin-left: 1rem;\r\n    font-size: 1.75rem;\n}\r\n", ""]);
 
 // exports
 
@@ -40903,7 +41142,7 @@ var render = function() {
                                   {
                                     staticClass:
                                       "btn btn-sm btn-success m-btn--icon m-btn--icon-only",
-                                    attrs: { title: "Resume" },
+                                    attrs: { title: "Play" },
                                     on: {
                                       click: function($event) {
                                         $event.preventDefault()
@@ -41160,7 +41399,7 @@ if (false) {
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d6c85f2\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/assets/js/components/DomainComponent.vue":
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d6c85f2\",\"hasScoped\":true,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/assets/js/components/DomainComponent.vue":
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -41171,7 +41410,16 @@ var render = function() {
     ? _c("div", [
         _c("div", { staticClass: "m-portlet" }, [
           _c("div", { staticClass: "m-portlet__head" }, [
-            _vm._m(0),
+            _c("div", { staticClass: "m-portlet__head-caption" }, [
+              _c("div", { staticClass: "m-portlet__head-title" }, [
+                _c("h3", { staticClass: "m-portlet__head-text" }, [
+                  _vm._v("Campaign  "),
+                  _c("strong", { staticClass: "campaign" }, [
+                    _vm._v(_vm._s(this.campaign))
+                  ])
+                ])
+              ])
+            ]),
             _vm._v(" "),
             _c("div", { staticClass: "m-portlet__head-tools" }, [
               _c(
@@ -41189,66 +41437,550 @@ var render = function() {
           _c("div", { staticClass: "m-portlet__body" }, [
             _c("div", { staticClass: "m-section" }, [
               _c("div", { staticClass: "m-section__content" }, [
-                _c(
-                  "table",
-                  { staticClass: "table table-striped m-table text-center" },
-                  [
-                    _vm._m(1),
-                    _vm._v(" "),
-                    _c(
-                      "tbody",
-                      _vm._l(_vm.domains, function(domain, index) {
-                        return _vm.domains.length
-                          ? _c("tr", { key: index }, [
-                              _c(
-                                "td",
-                                {
-                                  staticClass: "m-widget6__text",
-                                  attrs: { scope: "row" }
-                                },
-                                [
-                                  _c("a", { attrs: { href: "#" } }, [
-                                    _vm._v(_vm._s(domain.name))
-                                  ])
-                                ]
-                              ),
-                              _vm._v(" "),
-                              _c("td", [
-                                _c(
-                                  "span",
-                                  {
-                                    staticClass: "m-badge m-badge--wide",
-                                    class: [
-                                      domain.is_active
-                                        ? "m-badge--success"
-                                        : "m-badge--warning"
-                                    ]
-                                  },
-                                  [
-                                    _vm._v(
-                                      _vm._s(
-                                        _vm._f("statusLabel")(
-                                          _vm._f("domain.is_active")(
-                                            domain.is_used
-                                          )
+                _vm._m(0),
+                _vm._v(" "),
+                _c("div", { staticClass: "tab-content" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "tab-pane active",
+                      attrs: { id: "m_tabs_1", role: "tabpanel" }
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-brand m-btn mb-3",
+                          attrs: { type: "button" },
+                          on: { click: _vm.toggleDomainModal }
+                        },
+                        [_vm._v("Add Domain")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "table",
+                        {
+                          staticClass: "table table-striped m-table text-center"
+                        },
+                        [
+                          _vm._m(1),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.domains, function(domain, index) {
+                              return _vm.domains.length
+                                ? _c("tr", { key: index }, [
+                                    _c(
+                                      "td",
+                                      {
+                                        staticClass: "m-widget6__text",
+                                        attrs: { scope: "row" }
+                                      },
+                                      [
+                                        _c(
+                                          "a",
+                                          {
+                                            attrs: { href: "#" },
+                                            on: {
+                                              click: function($event) {
+                                                $event.preventDefault()
+                                              }
+                                            }
+                                          },
+                                          [_vm._v(_vm._s(domain.name))]
                                         )
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("td", [
+                                      _c(
+                                        "span",
+                                        {
+                                          staticClass: "m-badge m-badge--wide",
+                                          class: [
+                                            !domain.is_used && !domain.is_active
+                                              ? "m-badge--warning"
+                                              : domain.is_active &&
+                                                !domain.is_used
+                                                ? "m-badge--success"
+                                                : "m-badge--metal"
+                                          ]
+                                        },
+                                        [
+                                          _vm._v(
+                                            _vm._s(
+                                              _vm._f("statusLabel")(
+                                                domain.is_used,
+                                                domain.is_active
+                                              )
+                                            )
+                                          )
+                                        ]
                                       )
-                                    )
-                                  ]
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _vm._m(2, true)
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("td", [
+                                      _c(
+                                        "button",
+                                        {
+                                          staticClass:
+                                            "btn btn-sm btn-info m-btn--icon m-btn--icon-only",
+                                          attrs: {
+                                            type: "button",
+                                            title: "Edit"
+                                          },
+                                          on: {
+                                            click: function($event) {
+                                              $event.preventDefault()
+                                              _vm.editDomain(domain, index)
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass: "flaticon-edit"
+                                          })
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      !domain.is_active && !domain.is_used
+                                        ? _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-sm btn-success m-btn--icon m-btn--icon-only",
+                                              attrs: { title: "Play" },
+                                              on: {
+                                                click: function($event) {
+                                                  $event.preventDefault()
+                                                  _vm.updateStatus(
+                                                    domain,
+                                                    index
+                                                  )
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "la la-play"
+                                              })
+                                            ]
+                                          )
+                                        : domain.is_active && !domain.is_used
+                                          ? _c(
+                                              "button",
+                                              {
+                                                staticClass:
+                                                  "btn btn-sm btn-warning m-btn--icon m-btn--icon-only",
+                                                attrs: { title: "Pause" },
+                                                on: {
+                                                  click: function($event) {
+                                                    $event.preventDefault()
+                                                    _vm.updateStatus(
+                                                      domain,
+                                                      index
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass: "la la-pause"
+                                                })
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                      _vm._v(" "),
+                                      _c(
+                                        "button",
+                                        {
+                                          staticClass:
+                                            "btn btn-sm btn-danger m-btn--icon m-btn--icon-only",
+                                          attrs: {
+                                            type: "button",
+                                            title: "Remove"
+                                          },
+                                          on: {
+                                            click: function($event) {
+                                              $event.preventDefault()
+                                              _vm.deleteDomain(domain, index)
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass: "flaticon-delete-2"
+                                          })
+                                        ]
+                                      )
+                                    ])
+                                  ])
+                                : _vm._e()
+                            })
+                          )
+                        ]
+                      )
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "tab-pane",
+                      attrs: { id: "m_tabs_2", role: "tabpanel" }
+                    },
+                    [
+                      _c(
+                        "div",
+                        { staticClass: "form-group m-form__group row" },
+                        [
+                          _vm._m(2),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-10" }, [
+                            _c("p", { staticClass: "col-form-label" }, [
+                              _vm._v(_vm._s(this.serverName))
                             ])
-                          : _vm._e()
-                      })
-                    )
-                  ]
-                )
+                          ])
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "form-group m-form__group row" },
+                        [
+                          _vm._m(3),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-10" }, [
+                            _c("p", { staticClass: "col-form-label" }, [
+                              _vm._v(_vm._s(this.serverHost))
+                            ])
+                          ])
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group m-form__group" }, [
+                        _c("label", { attrs: { for: "serverName" } }, [
+                          _vm._v("Server Name")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.serverName,
+                              expression: "serverName"
+                            }
+                          ],
+                          staticClass: "form-control m-input m-input--solid",
+                          attrs: { type: "text", id: "serverName" },
+                          domProps: { value: _vm.serverName },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.serverName = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group m-form__group" }, [
+                        _c("label", { attrs: { for: "serverHost" } }, [
+                          _vm._v("Server Type")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.serverType,
+                              expression: "serverType"
+                            }
+                          ],
+                          staticClass: "form-control m-input m-input--solid",
+                          attrs: { type: "text", id: "serverType" },
+                          domProps: { value: _vm.serverType },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.serverType = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group m-form__group" }, [
+                        _c("label", { attrs: { for: "serverHost" } }, [
+                          _vm._v("Host")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.serverHost,
+                              expression: "serverHost"
+                            }
+                          ],
+                          staticClass: "form-control m-input m-input--solid",
+                          attrs: { type: "text", id: "serverHost" },
+                          domProps: { value: _vm.serverHost },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.serverHost = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group m-form__group" }, [
+                        _c("label", { attrs: { for: "serverHost" } }, [
+                          _vm._v("Username")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.serverUsername,
+                              expression: "serverUsername"
+                            }
+                          ],
+                          staticClass: "form-control m-input m-input--solid",
+                          attrs: { type: "text", id: "serverUsername" },
+                          domProps: { value: _vm.serverUsername },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.serverUsername = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group m-form__group" }, [
+                        _c("label", { attrs: { for: "serverPassword" } }, [
+                          _vm._v("Password")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.serverPassword,
+                              expression: "serverPassword"
+                            }
+                          ],
+                          staticClass: "form-control m-input m-input--solid",
+                          attrs: { type: "password", id: "serverPassword" },
+                          domProps: { value: _vm.serverPassword },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.serverPassword = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "m-form__actions text-right" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-accent",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                return _vm.submitServer($event)
+                              }
+                            }
+                          },
+                          [_vm._v("Save")]
+                        )
+                      ])
+                    ]
+                  )
+                ])
               ])
             ])
           ])
-        ])
+        ]),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.isModalshown,
+                expression: "isModalshown"
+              }
+            ],
+            staticClass: "modal fade show",
+            attrs: {
+              id: "m_modal",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "ModalLabel",
+              "aria-hidden": "true"
+            }
+          },
+          [
+            _c(
+              "div",
+              {
+                staticClass: "modal-dialog modal-md modal-dialog-centered",
+                attrs: { role: "document" }
+              },
+              [
+                _c("div", { staticClass: "modal-content" }, [
+                  _c("div", { staticClass: "modal-header" }, [
+                    !_vm.isEdit
+                      ? _c(
+                          "h5",
+                          {
+                            staticClass: "modal-title",
+                            attrs: { id: "ModalLabel" }
+                          },
+                          [_vm._v("New Domain")]
+                        )
+                      : _c(
+                          "h5",
+                          {
+                            staticClass: "modal-title",
+                            attrs: { id: "ModalLabel" }
+                          },
+                          [_vm._v("Edit Domain")]
+                        ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "close",
+                        attrs: { type: "button", "aria-label": "Close" },
+                        on: {
+                          click: function($event) {
+                            _vm.toggleDomainModal() + _vm.empty()
+                          }
+                        }
+                      },
+                      [
+                        _c("span", { attrs: { "aria-hidden": "true" } }, [
+                          _vm._v("×")
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("form", [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "form-control-label",
+                            attrs: { for: "message-text" }
+                          },
+                          [_vm._v("Enter Domain")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.domainModel,
+                              expression: "domainModel"
+                            }
+                          ],
+                          ref: "domain",
+                          staticClass: "form-control",
+                          attrs: { type: "text" },
+                          domProps: { value: _vm.domainModel },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.domainModel = $event.target.value
+                            }
+                          }
+                        })
+                      ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            _vm.toggleDomainModal() + _vm.empty()
+                          }
+                        }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    !_vm.isEdit
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                _vm.submitDomain() + _vm.toggleDomainModal()
+                              }
+                            }
+                          },
+                          [_vm._v("Submit")]
+                        )
+                      : _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                _vm.submitDomain() + _vm.toggleDomainModal()
+                              }
+                            }
+                          },
+                          [_vm._v("Update")]
+                        )
+                  ])
+                ])
+              ]
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _vm.isModalshown
+          ? _c("div", { staticClass: "modal-backdrop fade show" })
+          : _vm._e()
       ])
     : _vm._e()
 }
@@ -41257,15 +41989,33 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "m-portlet__head-caption" }, [
-      _c("div", { staticClass: "m-portlet__head-title" }, [
-        _c("h3", { staticClass: "m-portlet__head-text" }, [
-          _vm._v(
-            "\n                            Campaign\n                        "
+    return _c(
+      "ul",
+      { staticClass: "nav nav-tabs nav-fill", attrs: { role: "tablist" } },
+      [
+        _c("li", { staticClass: "nav-item" }, [
+          _c(
+            "a",
+            {
+              staticClass: "nav-link active show",
+              attrs: { "data-toggle": "tab", href: "#m_tabs_1" }
+            },
+            [_vm._v("Domains")]
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", { staticClass: "nav-item" }, [
+          _c(
+            "a",
+            {
+              staticClass: "nav-link",
+              attrs: { "data-toggle": "tab", href: "#m_tabs_2" }
+            },
+            [_vm._v("Server")]
           )
         ])
-      ])
-    ])
+      ]
+    )
   },
   function() {
     var _vm = this
@@ -41285,15 +42035,16 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-sm btn-info m-btn--icon m-btn--icon-only",
-          attrs: { type: "button", title: "Edit" }
-        },
-        [_c("i", { staticClass: "flaticon-edit" })]
-      )
+    return _c("p", { staticClass: "col-2 col-form-label text-center" }, [
+      _c("strong", [_vm._v("Name")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", { staticClass: "col-2 col-form-label text-center" }, [
+      _c("strong", [_vm._v("Host")])
     ])
   }
 ]
@@ -41523,6 +42274,33 @@ if(false) {
  if(!content.locals) {
    module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2912e8e6\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./CampaignComponent.vue", function() {
      var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2912e8e6\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./CampaignComponent.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7d6c85f2\",\"scoped\":true,\"hasInlineConfig\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./resources/assets/js/components/DomainComponent.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__("./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7d6c85f2\",\"scoped\":true,\"hasInlineConfig\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./resources/assets/js/components/DomainComponent.vue");
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__("./node_modules/vue-style-loader/lib/addStylesClient.js")("52ccd31a", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7d6c85f2\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./DomainComponent.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7d6c85f2\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./DomainComponent.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -53028,17 +53806,21 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__("./node_modules/vue-style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7d6c85f2\",\"scoped\":true,\"hasInlineConfig\":true}!./node_modules/vue-loader/lib/selector.js?type=styles&index=0!./resources/assets/js/components/DomainComponent.vue")
+}
 var normalizeComponent = __webpack_require__("./node_modules/vue-loader/lib/component-normalizer.js")
 /* script */
 var __vue_script__ = __webpack_require__("./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/assets/js/components/DomainComponent.vue")
 /* template */
-var __vue_template__ = __webpack_require__("./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d6c85f2\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/assets/js/components/DomainComponent.vue")
+var __vue_template__ = __webpack_require__("./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-7d6c85f2\",\"hasScoped\":true,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/assets/js/components/DomainComponent.vue")
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
-var __vue_styles__ = null
+var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = null
+var __vue_scopeId__ = "data-v-7d6c85f2"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(

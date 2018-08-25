@@ -15,8 +15,18 @@ class Campaign extends Model
         return $this;
     }
 
+    public function server()
+    {
+        return $this->hasOne('App\Server');
+    }
+
     public function domains()
     {
         return $this->hasMany('App\Domain');
+    }
+
+    public function domainsSorted()
+    {
+        return $this->hasMany('App\Domain')->orderBy('is_active','desc')->orderBy('is_used','asc');
     }
 }

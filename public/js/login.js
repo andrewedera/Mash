@@ -1724,9 +1724,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             errors: [],
             data: '',
             name: '',
-            email: '',
-            password: '',
-            verifypw: '',
+            email: 'admin@322nation.com',
+            password: 'secret',
+            verifypw: 'secret',
             agree: false
         };
     },
@@ -1751,9 +1751,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     password: this.password
                 }).then(function (response) {
                     _this.data = response.data;
-                    console.log(_this.data);
+                    window.location.href = '/';
                 }).catch(function (err) {
-                    _this.errors.push(err.response.data.errors);
+                    _this.errors.push(err.response.data.error);
                 });
             }
         },
@@ -1782,10 +1782,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     password: this.password,
                     password_confirmation: this.verifypw
                 }).then(function (response) {
-                    _this2.data = response.data;
-                    console.log(_this2.data);
+                    window.location.href = '/';
                 }).catch(function (err) {
-                    _this2.errors.push(err.response.data.errors);
+                    _this2.errors.push(err.response.data.error);
                 });
             }
         },

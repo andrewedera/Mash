@@ -24,15 +24,19 @@
 
 <script>
     export default {
+		data() {
+			return {
+				user_token: '',
+			}
+		},
         methods: {
 			logout() {
 				axios.post(`/logout`)
                 .then(response => {
-                    this.data = response.data
-                    console.log(this.data)
+					window.location.href = '/login'
                 })
                 .catch(err => {
-					console.log(err.response.data.errors)
+					console.log(err.response.data.error)
                     //this.errors.push(err.response.data.errors);
                 })
 			}

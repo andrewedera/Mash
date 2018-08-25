@@ -84,9 +84,9 @@ export default {
             errors: [],
             data: '',
             name: '',
-            email: '',
-            password: '',
-            verifypw: '',
+            email: 'admin@322nation.com',
+            password: 'secret',
+            verifypw: 'secret',
             agree: false
         }
     },
@@ -109,10 +109,10 @@ export default {
                 })
                 .then(response => {
                     this.data = response.data
-                    console.log(this.data)
+                    window.location.href = '/'
                 })
                 .catch(err => {
-                    this.errors.push(err.response.data.errors);
+                    this.errors.push(err.response.data.error);
                 })
             }
         },
@@ -141,11 +141,10 @@ export default {
                     password_confirmation: this.verifypw
                 })
                 .then(response => {
-                    this.data = response.data
-                    console.log(this.data)
+                    window.location.href = '/'
                 })
                 .catch(err => {
-                    this.errors.push(err.response.data.errors);
+                    this.errors.push(err.response.data.error);
                 })
             }
         },

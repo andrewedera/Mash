@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Campaign;
-use App\Http\Resources\Campaign as CampaignResource;
+use App\Domain;
+use App\Server;
+use App\Http\Resources\CampaignResource;
+use App\Http\Resources\DomainResource;
+use App\Http\Resources\ServerResource;
 use Illuminate\Http\Request;
 
 class CampaignController extends Controller
@@ -27,16 +31,33 @@ class CampaignController extends Controller
      */
     public function store(Request $request)
     {
-        $Campaign = new Campaign;
-        $Campaign->name = $request->name;
-        $Campaign->save();
-        return new CampaignResource($Campaign);
+        $validatedData = $request->validate([
+            'name' => 'required|unique:campaigns',
+        ]);
+
+        $Campaign = Campaign::create([
+            'name' => $request->name,
+        ]);
+
+        return CampaignResource::collection($Campaign::withCount('domains')->get());
     }
 
     public function edit(Campaign $campaign)
     {
-        $camp = Campaign::findOrFail($campaign['id'])->domains;
-        return new CampaignResource($camp);
+        $domain = Domain::where('campaign_id', $campaign['id'])
+                ->orderBy('is_active','desc')
+                ->orderBy('is_used','asc')
+                ->with('campaign')
+                ->get();
+
+        $server = Server::where('campaign_id', $campaign['id'])->first();
+
+        return (DomainResource::collection($domain))
+                ->additional([
+                    'campaign_id' => $campaign->id,
+                    'campaign' => $campaign->name,
+                    'server' => (!is_null($server)) ? new ServerResource($server) : null,
+                ]);
     }
 
     /**
@@ -48,7 +69,7 @@ class CampaignController extends Controller
      */
     public function update(Request $request, Campaign $campaign)
     {
-        $Campaigns = Campaign::findOrFail($campaign['id']);
+        $Campaigns = Campaign::withCount('domains')->findOrFail($campaign['id']);
         if ($request->has('name')) {
             $Campaigns->name = $request['name'];
         }
@@ -68,5 +89,6 @@ class CampaignController extends Controller
     public function destroy(Campaign $campaign)
     {
         $campaign->delete();
+        return response()->json(null, 204);
     }
 }
