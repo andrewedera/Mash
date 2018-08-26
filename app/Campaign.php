@@ -10,6 +10,11 @@ class Campaign extends Model
         'name',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+
     public function toggleStatus() {
         $this->is_active = !$this->is_active;
         return $this;

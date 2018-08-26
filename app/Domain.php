@@ -15,6 +15,11 @@ class Domain extends Model
         return $this->belongsTo('App\Campaign');
     }
 
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+
     public function toggleStatus() {
         if(!$this->is_active && !$this->is_used)
             $this->is_active = true;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Domain;
 use App\Http\Resources\DomainResource;
 use Illuminate\Http\Request;
@@ -25,12 +26,15 @@ class DomainController extends Controller
             'name' => 'required|unique:domains',
         ]);
 
-        $Domain = Domain::create([
+        $Domain = new Domain([
             'name' => $request->name,
             'campaign_id' => $request->campaign_id,
             'is_used' => false,
             'is_active' => false,
         ]);
+
+        $Domain = Auth::user()->domain()->save($Domain);
+        
         return new DomainResource($Domain);
     }
 
@@ -43,13 +47,16 @@ class DomainController extends Controller
      */
     public function update(Request $request, Domain $domain)
     {
-        $Domains = Domain::findOrFail($domain['id']);
+        $Domains = Domain::where('id', $domain['id'])
+                    ->where('user_id',Auth::id())->first();
+
         if ($request->has('name')) {
             $Domains->name = $request['name'];
         }
         if ($request->has('toggleStatus')) {
             if (Domain::where('is_active', true)
                 ->where('is_used', false)
+                ->where('user_id',Auth::id())
                 ->where('id', '<>', $domain['id'])
                 ->where('campaign_id', $Domains['campaign_id'])
                 ->count() >= 1)
@@ -69,7 +76,11 @@ class DomainController extends Controller
      */
     public function destroy(Domain $domain)
     {
-        $domain->delete();
-        return response()->json(null, 204);
+        if ($domain->user_id == Auth::id()) {
+            $domain->delete();
+            return response()->json(null, 204);
+        }
+        else
+            return response()->json(['data' => 'Permission not allowed'], 400);
     }
 }

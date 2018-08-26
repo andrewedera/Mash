@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use App\Campaign;
+use App\Domain;
+use App\Server;
+use App\Setting;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,10 +28,10 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $data['campaign'] = \App\Campaign::count();
-        $data['domain'] = \App\Domain::count();
-        $data['server'] = \App\Server::count();
-        $data['rotator'] = \App\Setting::select('setting_value')->where('setting_name', 'setting_isRotate')->first();
+        $data['campaign'] = Campaign::where('user_id',Auth::id())->count();
+        $data['domain'] = Domain::where('user_id',Auth::id())->count();
+        $data['server'] = Server::where('user_id',Auth::id())->count();
+        $data['rotator'] = Setting::select('setting_value')->where('user_id',Auth::id())->where('setting_name', 'setting_isRotate')->first();
         return view('dashboard', compact('data'));
     }
 }

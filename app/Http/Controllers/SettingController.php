@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Setting;
 use App\Http\Resources\SettingResource;
 use Illuminate\Http\Request;
@@ -16,7 +17,8 @@ class SettingController extends Controller
     public function indexRotator()
     {
         $return = [];
-        $settings = Setting::where('setting_type', 'rotator')->get();
+        $settings = Setting::where('setting_type', 'rotator')
+                    ->where('user_id',Auth::id())->get();
 
         foreach($settings as $setting) {
             if($setting->setting_name == 'setting_isRotate') {
@@ -42,15 +44,17 @@ class SettingController extends Controller
     public function editRotator(Request $request)
     {
         foreach ($request->data as $key => $value) {
-            Setting::where('setting_name', $value['setting_name'])
-            ->update(['setting_value' => $value['setting_value']]);
+            Auth::user()
+                ->setting()->where('setting_name', $value['setting_name'])
+                ->update(['setting_value' => $value['setting_value']]);
         }
     }
 
     public function indexKeys()
     {
         $return = [];
-        $settings = Setting::where('setting_type', 'keys')->get();
+        $settings = Setting::where('setting_type', 'keys')
+                    ->where('user_id',Auth::id())->get();
 
         foreach($settings as $setting) {
             if($setting->setting_name == 'setting_do_key') {
@@ -100,8 +104,9 @@ class SettingController extends Controller
     public function editKeys(Request $request)
     {
         foreach ($request->data as $key => $value) {
-            Setting::where('setting_name', $value['setting_name'])
-            ->update(['setting_value' => $value['setting_value']]);
+            Auth::user()
+                ->setting()->where('setting_name', $value['setting_name'])
+                ->update(['setting_value' => $value['setting_value']]);
         }
     }
 }

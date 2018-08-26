@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Server;
 use App\Http\Resources\ServerResource;
 use Illuminate\Http\Request;
@@ -23,16 +24,17 @@ class ServerController extends Controller
             'server_username' => 'required',
         ]);
 
-        $server = Server::updateOrCreate(
-        [   'campaign_id' => $request['campaign_id'] ],
-        [
+        $server = Auth::user()->server()->updateOrCreate([
+            'campaign_id' => $request['campaign_id']
+        ],[
             'campaign_id' => $request['campaign_id'],
             'name' => $request['name'],
             'server_ip' => $request['server_ip'],
             'server_password' => $request['server_password'],
             'server_type' => $request['server_type'],
-            'server_username' => $request['server_username'],
+            'server_username' => $request['server_username']
         ]);
+
         return new ServerResource($server);
     }
 }

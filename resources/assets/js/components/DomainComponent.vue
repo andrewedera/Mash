@@ -299,8 +299,6 @@ export default {
             this.domainModel = ''
             this.domainID = ''
             this.domainIndex = ''
-            this.campaign = ''
-            this.campaignID = ''
         },
     },
     created() {

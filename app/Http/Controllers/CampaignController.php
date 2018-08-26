@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Campaign;
 use App\Domain;
 use App\Server;
@@ -19,7 +20,7 @@ class CampaignController extends Controller
 
     public function index()
     {
-        $campaign = Campaign::withCount('domains')->get();
+        $campaign = Campaign::withCount('domains')->where('user_id',Auth::id())->get();
         return CampaignResource::collection($campaign);
     }
 
@@ -35,22 +36,23 @@ class CampaignController extends Controller
             'name' => 'required|unique:campaigns',
         ]);
 
-        $Campaign = Campaign::create([
-            'name' => $request->name,
-        ]);
+        $campaign = new Campaign(['name' => $request->name]);
 
-        return CampaignResource::collection($Campaign::withCount('domains')->get());
+        $campaign = Auth::user()->campaign()->save($campaign);
+
+        return CampaignResource::collection($campaign::withCount('domains')->get());
     }
 
     public function edit(Campaign $campaign)
     {
         $domain = Domain::where('campaign_id', $campaign['id'])
+                ->where('user_id',Auth::id())
                 ->orderBy('is_active','desc')
                 ->orderBy('is_used','asc')
                 ->with('campaign')
                 ->get();
 
-        $server = Server::where('campaign_id', $campaign['id'])->first();
+        $server = Server::where('campaign_id', $campaign['id'])->where('user_id',Auth::id())->first();
 
         return (DomainResource::collection($domain))
                 ->additional([
@@ -69,7 +71,10 @@ class CampaignController extends Controller
      */
     public function update(Request $request, Campaign $campaign)
     {
-        $Campaigns = Campaign::withCount('domains')->findOrFail($campaign['id']);
+        $Campaigns = Campaign::withCount('domains')
+                    ->where('id', $campaign['id'])
+                    ->where('user_id',Auth::id())->first();
+        //$Campaigns = Campaign::withCount('domains')->findOrFail($campaign['id']);
         if ($request->has('name')) {
             $Campaigns->name = $request['name'];
         }
@@ -88,7 +93,11 @@ class CampaignController extends Controller
      */
     public function destroy(Campaign $campaign)
     {
-        $campaign->delete();
-        return response()->json(null, 204);
+        if ($campaign->user_id == Auth::id()) {
+            $campaign->delete();
+            return response()->json(null, 204);
+        }
+        else
+            return response()->json(['data' => 'Permission not allowed'], 400);
     }
 }

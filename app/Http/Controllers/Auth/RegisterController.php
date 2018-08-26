@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\Setting;
+use App\Server;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -63,11 +65,22 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'api_token' => str_random(60),
         ]);
+
+        $user->setting()->saveMany([
+            new Setting(['setting_name' => 'setting_isRotate', 'setting_type' => 'rotator']),
+            new Setting(['setting_name' => 'setting_rotateMinute', 'setting_type' => 'rotator']),
+            new Setting(['setting_name' => 'setting_do_key', 'setting_type' => 'keys']),
+            new Setting(['setting_name' => 'setting_vu_key', 'setting_type' => 'keys']),
+            new Setting(['setting_name' => 'setting_rc_key', 'setting_type' => 'keys']),
+            new Setting(['setting_name' => 'setting_nc_key', 'setting_type' => 'keys']),
+            new Setting(['setting_name' => 'setting_fn_key', 'setting_type' => 'keys']),
+        ]);
+
+        return $user;
     }
 }
