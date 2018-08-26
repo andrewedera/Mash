@@ -57,7 +57,7 @@
         <div class="m-portlet m-portlet--half-height m-portlet--border-bottom-brand text-center" style="height: 216px;">
             <div class="m-portlet__body">
                 <div class="m-widget26">
-                    <div class="m-widget26__number m--font-success">Running<small style="font-size:1.25rem;color:#575962;">Rotator Status</small>
+                <div class="m-widget26__number {{($data['rotator']->setting_value) ? 'm--font-success' : 'm--font-danger'}}">{{($data['rotator']->setting_value) ? 'Running' : 'Stopped'}}<small style="font-size:1.25rem;color:#575962;">Rotator Status</small>
                     </div>
                 </div>
             </div>

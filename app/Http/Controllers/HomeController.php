@@ -26,6 +26,7 @@ class HomeController extends Controller
         $data['campaign'] = \App\Campaign::count();
         $data['domain'] = \App\Domain::count();
         $data['server'] = \App\Server::count();
+        $data['rotator'] = \App\Setting::select('setting_value')->where('setting_name', 'setting_isRotate')->first();
         return view('dashboard', compact('data'));
     }
 }

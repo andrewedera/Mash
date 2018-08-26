@@ -84,9 +84,9 @@ export default {
             errors: [],
             data: '',
             name: '',
-            email: 'admin@322nation.com',
-            password: 'secret',
-            verifypw: 'secret',
+            email: '',
+            password: '',
+            verifypw: '',
             agree: false
         }
     },

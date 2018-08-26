@@ -21,6 +21,8 @@ import VueSweetalert2 from 'vue-sweetalert2';
 Vue.component('sidebar-component', require('./components/SidebarComponent.vue'));
 Vue.component('campaign-component', require('./components/CampaignComponent.vue'));
 Vue.component('domain-component', require('./components/DomainComponent.vue'));
+Vue.component('rotator-component', require('./components/RotatorComponent.vue'));
+Vue.component('keys-component', require('./components/KeysComponent.vue'));
 
 Vue.filter('uppercase', function (value) {
 	return value.toUpperCase()

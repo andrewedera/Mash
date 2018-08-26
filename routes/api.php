@@ -28,3 +28,8 @@ Route::resource('domain', 'DomainController')->only([
 Route::resource('server', 'ServerController')->only([
     'store'
 ]);
+
+Route::get('/rotator', 'SettingController@indexRotator');
+Route::put('/rotator', 'SettingController@editRotator');
+Route::get('/keys', 'SettingController@indexKeys');
+Route::put('/keys', 'SettingController@editKeys');

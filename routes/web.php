@@ -32,6 +32,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('campaigns', function(){
         return view('campaigns');
     });
+    Route::get('rotator', function(){
+        return view('rotator');
+    });
+    Route::get('keys', function(){
+        return view('keys');
+    });
 });
 
 Route::post('login', function (Request $request) {
