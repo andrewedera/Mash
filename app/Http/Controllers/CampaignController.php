@@ -40,7 +40,7 @@ class CampaignController extends Controller
 
         $campaign = Auth::user()->campaign()->save($campaign);
 
-        return CampaignResource::collection($campaign::withCount('domains')->get());
+        return CampaignResource::collection($campaign::withCount('domains')->where('user_id',Auth::id())->get());
     }
 
     public function edit(Campaign $campaign)
